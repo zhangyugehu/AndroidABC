@@ -48,6 +48,7 @@ public class BannerActivity extends AppCompatActivity {
         mViewPager.setPageMargin(30);
         mViewPager.setOffscreenPageLimit(3);
 
+        mViewPager.setOverScrollMode(View.OVER_SCROLL_NEVER);
         mViewPager.setPageTransformer(true, new ZoomOutSlideTransformer());
 
         mViewPager.setAdapter(new PagerAdapter() {

@@ -3,6 +3,7 @@ package com.zhangyugehu.androidabc.viewpager;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresFeature;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
@@ -11,6 +12,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ImageView;
 
 import com.zhangyugehu.androidabc.R;
 
@@ -50,7 +53,7 @@ public class ViewPagerActivity extends AppCompatActivity {
 
     private void initPageStrip() {
         mPagerTabStrip.setDrawFullUnderline(false);
-        mPagerTabStrip.setBackgroundColor(Color.WHITE);
+        mPagerTabStrip.setBackgroundResource(R.color.colorPrimary);
         mPagerTabStrip.setTabIndicatorColor(Color.RED);
 //        mPagerTabStrip.setTextSpacing(400);
     }
@@ -83,7 +86,9 @@ public class ViewPagerActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
-            return mPagerInfoContainer.get(position).view;
+            View view = mPagerInfoContainer.get(position).view;
+            container.addView(view);
+            return view;
         }
 
         @Nullable

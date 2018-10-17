@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_main"
+        android:checked="true"
+        android:title="@string/main_fragment"
+        android:icon="@drawable/ic_toys_black_24dp" />
+    <item
+        android:id="@+id/menu_contact"
+        android:checked="true"
+        android:title="@string/contact_fragment"
+        android:icon="@drawable/ic_contacts_black_24dp" />
+    <item
+        android:id="@+id/menu_discover"
+        android:checked="true"
+        android:title="@string/discover_fragment"
+        android:icon="@drawable/ic_explore_black_24dp" />
+    <item
+        android:id="@+id/menu_mine"
+        android:checked="true"
+        android:title="@string/mine_fragment"
+        android:icon="@drawable/ic_account_circle_black_24dp" />
+</menu>

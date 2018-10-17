@@ -18,6 +18,8 @@ import com.zhangyugehu.androidabc.view.event.MoveGestureDetector;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class LargerImageView extends View {
 
@@ -36,7 +38,16 @@ public class LargerImageView extends View {
 
     private HandlerThread mHandlerThread;
     private Handler mThreadHandler;
-    private Handler mMainHandler = new Handler();
+    private Handler mMainHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message message) {
+
+            if(message.what != 101) return true;
+            mRegionBitmap = (Bitmap) message.obj;
+            invalidate();
+            return true;
+        }
+    });
 
     public LargerImageView(Context context) {
         this(context, null);
@@ -50,59 +61,62 @@ public class LargerImageView extends View {
         super(context, attrs, defStyleAttr);
     }
 
-    private void handlerInvalidate() {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                invalidate();
-            }
-        });
+    private void handlerInvalidate(Bitmap bitmap) {
+        mMainHandler.sendMessage(mMainHandler.obtainMessage(101, bitmap));
     }
+
+    private ReadWriteLock decoderLock = new ReentrantReadWriteLock();
 
     public void setImageStream(InputStream is) {
         try {
             mDetector = new MoveGestureDetector(getContext(),
-                    new MoveGestureDetector.SimpleMoveGestureDetector() {
-                        @Override
-                        public boolean onMove(MoveGestureDetector detector) {
-                            int moveX = (int) detector.getMoveX();
-                            int moveY = (int) detector.getMoveY();
+                new MoveGestureDetector.SimpleMoveGestureDetector() {
+                    @Override
+                    public boolean onMove(MoveGestureDetector detector) {
+                        int moveX = (int) detector.getMoveX();
+                        int moveY = (int) detector.getMoveY();
 
-                            if (mImageBounds.right > getWidth()) {
-                                mViewRect.offset(-moveX, 0);
-                                checkWidth();
-                                mThreadHandler.sendEmptyMessage(0);
-                            }
-                            if (mImageBounds.bottom > getHeight()) {
-                                mViewRect.offset(0, -moveY);
-                                checkHeight();
-                                mThreadHandler.sendEmptyMessage(0);
-                            }
-                            return true;
+                        if (mImageBounds.right > getWidth()) {
+                            mViewRect.offset(-moveX, 0);
+                            checkWidth();
+                            mThreadHandler.sendEmptyMessage(0);
                         }
-                    });
+                        if (mImageBounds.bottom > getHeight()) {
+                            mViewRect.offset(0, -moveY);
+                            checkHeight();
+                            mThreadHandler.sendEmptyMessage(0);
+                        }
+                        return true;
+                    }
+                });
             mHandlerThread = new HandlerThread("regionBitmapDecoderThread");
             mHandlerThread.start();
             mThreadHandler = new Handler(mHandlerThread.getLooper()) {
                 @Override
                 public void handleMessage(Message msg) {
                     if (msg.what != 0) return;
+                    if (mPrevViewRect.left == mViewRect.left &&
+                            mPrevViewRect.right == mViewRect.right &&
+                            mPrevViewRect.top == mViewRect.top &&
+                            mPrevViewRect.bottom == mViewRect.bottom)
+                        return;
+                    System.out.println("regionBitmapDecoderThread");
+                    Bitmap bitmap = null;
                     try {
-                        if (mPrevViewRect.left == mViewRect.left &&
-                                mPrevViewRect.right == mViewRect.right &&
-                                mPrevViewRect.top == mViewRect.top &&
-                                mPrevViewRect.bottom == mViewRect.bottom)
-                            return;
+                        decoderLock.readLock().lock();
                         System.out.println(mViewRect);
-                        mRegionBitmap = mDecoder.decodeRegion(mViewRect, mOptions);
+                        bitmap = mDecoder.decodeRegion(mViewRect, mOptions);
                         mPrevViewRect.left = mViewRect.left;
                         mPrevViewRect.top = mViewRect.top;
                         mPrevViewRect.right = mViewRect.right;
                         mPrevViewRect.bottom = mViewRect.bottom;
+                        decoderLock.readLock().unlock();
                     } catch (Exception e) {
                         e.printStackTrace();
+                    }finally {
+
                     }
-                    handlerInvalidate();
+                    handlerInvalidate(bitmap);
                 }
             };
 
@@ -179,8 +193,8 @@ public class LargerImageView extends View {
     protected void onDraw(Canvas canvas) {
         if (mRegionBitmap != null) {
             canvas.drawBitmap(mRegionBitmap, 0, 0, null);
-            mRegionBitmap.recycle();
-            mRegionBitmap = null;
+//            mRegionBitmap.recycle();
+//            mRegionBitmap = null;
         }
 //        canvas.drawBitmap(mDecoder.decodeRegion(mViewRect, mOptions), 0, 0, null);
     }

@@ -23,7 +23,7 @@ public class MyBigImageActivity extends AppCompatActivity {
         lagerImageView  = findViewById(R.id.larger_image_view);
         imageView  = findViewById(R.id.image_view);
         try {
-            InputStream imageStream = getAssets().open("jlk3.jpg");
+            InputStream imageStream = getAssets().open("card.png");
             lagerImageView.setImageStream(imageStream);
 //            imageView.setImageBitmap(BitmapFactory.decodeStream(imageStream));
         } catch (IOException e) {

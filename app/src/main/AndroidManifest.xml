@@ -11,9 +11,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".bigimage.BlogBigImageActivity">
+        <activity android:name=".KotlinActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
@@ -23,11 +24,15 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
                     android:host="www.zhangyugehu.com"
-                    android:pathPattern="/abc" />
+                    android:pathPattern="/abc"
+                    android:scheme="http" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="com.zhangyugehu.androidabc.kotlin.intentservice.AsyncWorkerService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

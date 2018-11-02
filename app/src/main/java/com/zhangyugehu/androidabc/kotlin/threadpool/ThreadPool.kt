@@ -19,7 +19,6 @@ class ThreadPool private constructor(){
     }
     companion object {
         fun get():ThreadPool{
-            Character.isWhitespace(' ')
             return Inner.instance
         }
         private const val CORE_POOL_SIZE: Int = 3

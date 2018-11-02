@@ -11,14 +11,20 @@ import android.widget.TextView;
 
 import java.util.concurrent.Executors;
 
+import retrofit2.Retrofit;
+
 public class ConvertActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Executors.newSingleThreadExecutor().execute(() -> {
+        Retrofit retrofit = new Retrofit.Builder().build();
+        ApiService apiService = retrofit.create(ApiService.class);
 
-        });
+    }
+
+    interface ApiService{
+        void list();
     }
 
 }
